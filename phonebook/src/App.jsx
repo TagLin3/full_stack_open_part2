@@ -1,6 +1,28 @@
 import { useState, useEffect } from "react";
 import personService from "./services/persons";
 
+const Notification = ({ message, error }) => {
+  if (message === null) {
+    return null;
+  }
+
+  const style = {
+    marginBottom: 10,
+    borderRadius: 5,
+    padding: 10,
+    fontSize: 20,
+    borderStyle: "solid",
+    background: "lightgray",
+    color: "green",
+  };
+
+  if (error) {
+    style.color = "red";
+  }
+
+  return <div style={style}>{message}</div>;
+};
+
 const PersonForm = ({
   handleFormSubmit,
   newName,
@@ -61,6 +83,8 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
+  const [message, setMessage] = useState(null);
+  const [isErrorMessage, setIsErrorMessage] = useState(false);
 
   useEffect(() => {
     personService.getAll().then((returnedPersons) => {
@@ -93,6 +117,23 @@ const App = () => {
                 p.id !== personToUpdate.id ? p : updatedPerson
               )
             );
+            setIsErrorMessage(false);
+            setMessage(`Updated phone number of ${personObj.name}`);
+            setTimeout(() => {
+              setMessage(null);
+            }, 3000);
+          })
+          .catch((error) => {
+            setIsErrorMessage(true);
+            setMessage(
+              `information of ${personObj.name} has already been removed from server`
+            );
+            setPersons(persons.filter((p) => p.name !== personObj.name));
+            setNewName("");
+            setNewNumber("");
+            setTimeout(() => {
+              setMessage(null);
+            }, 3000);
           });
       }
     } else {
@@ -100,6 +141,11 @@ const App = () => {
         setPersons(persons.concat(createdPerson));
         setNewName("");
         setNewNumber("");
+        setIsErrorMessage(false);
+        setMessage(`Added ${personObj.name}`);
+        setTimeout(() => {
+          setMessage(null);
+        }, 3000);
       });
     }
   };
@@ -118,6 +164,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} error={isErrorMessage} />
       <Filter filter={filter} setFilter={setFilter} />
       <h3>Add a new</h3>
       <PersonForm
