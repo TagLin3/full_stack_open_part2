@@ -72,16 +72,19 @@ function App() {
         );
         setFoundCountries(searchResults);
         if (searchResults.length === 1) {
-          getWeatherData(searchResults[0]);
+          getWeatherData(searchResults);
         }
       });
   };
 
   const getWeatherData = (searchResults) => {
-    if (weatherData === null || weatherData.name !== searchResults.capital[0]) {
+    if (
+      weatherData === null ||
+      weatherData.name !== searchResults[0].capital[0]
+    ) {
       axios
         .get(
-          `https://api.openweathermap.org/data/2.5/weather?q=${searchResults.capital[0]}&appid=${api_key}&units=metric`
+          `https://api.openweathermap.org/data/2.5/weather?q=${searchResults[0].capital[0]}&appid=${api_key}&units=metric`
         )
         .then((response) => {
           setWeatherData(response.data);
@@ -97,7 +100,7 @@ function App() {
       )
       .then((result) => {
         setFoundCountries([result.data]);
-        getWeatherData(result.data);
+        getWeatherData([result.data]);
       });
   };
 
